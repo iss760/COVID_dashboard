@@ -24,9 +24,13 @@ OPTION = {'확진자': 'decideCnt',
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 # 앱 설정
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
 
 # load datasets
 df = pd.read_csv(DATA_PATH, index_col=0)
+
+# 날짜 타입 변환
+df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')\
 
 # 레이아웃 설정
 app.layout = html.Div(children=[
@@ -49,10 +53,11 @@ app.layout = html.Div(children=[
 
     html.Label('Slider'),
     dcc.Slider(
-        min=0,
-        max=9,
-        marks={i: 'Label {}'.format(i) if i == 1 else str(i) for i in range(1, 9)},
-        value=1
+        id='month-slider',
+        min=int(df['date'].dt.month.min()),
+        max=int(df['date'].dt.month.max()),
+        marks={int(date): int(date) for date in df['date'].dt.month.unique()},
+        value=int(df['date'].dt.month.min())
     ),
 ])
 
